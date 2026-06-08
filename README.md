@@ -22,6 +22,7 @@ homework_block_3/
 ├── pyproject.toml
 ├── README.md
 └── .flake8
+└── .gitignore
 ```
 ## Функциональность
 

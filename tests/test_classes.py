@@ -64,18 +64,20 @@ class TestCategory:
 
     def test_category_count_increment(self):
         """Тест автоматического подсчета количества категорий"""
+        # Сохраняем начальное значение
         initial_count = Category.category_count
 
         # Создаем новую категорию
-        category1 = Category("Категория 1", "Описание 1")
+        Category("Категория 1", "Описание 1")
         assert Category.category_count == initial_count + 1
 
         # Создаем еще одну категорию
-        category2 = Category("Категория 2", "Описание 2")
+        Category("Категория 2", "Описание 2")
         assert Category.category_count == initial_count + 2
 
     def test_product_count_calculation(self):
         """Тест корректного подсчета количества товаров"""
+        # Сохраняем начальное значение
         initial_count = Category.product_count
 
         # Создаем категорию с 3 товарами
@@ -84,7 +86,7 @@ class TestCategory:
             Product("Товар 2", "Описание 2", 200, 20),
             Product("Товар 3", "Описание 3", 300, 30)
         ]
-        category = Category("Тестовая категория", "Описание", products)
+        Category("Тестовая категория", "Описание", products)
 
         # Проверяем, что количество товаров увеличилось на 3
         assert Category.product_count == initial_count + 3
@@ -100,20 +102,21 @@ class TestCategory:
             Product("Товар A", "Описание A", 100, 5),
             Product("Товар B", "Описание B", 200, 3)
         ]
-        category1 = Category("Категория 1", "Описание 1", cat1_products)
+        Category("Категория 1", "Описание 1", cat1_products)
 
         assert Category.category_count == 1
         assert Category.product_count == 2
 
         # Создаем вторую категорию с 1 товаром
         cat2_products = [Product("Товар C", "Описание C", 300, 7)]
-        category2 = Category("Категория 2", "Описание 2", cat2_products)
+        Category("Категория 2", "Описание 2", cat2_products)
 
         assert Category.category_count == 2
         assert Category.product_count == 3
 
     def test_add_product_to_category(self):
         """Тест добавления продукта в категорию"""
+        # Сохраняем начальное значение
         initial_count = Category.product_count
 
         category = Category("Тестовая категория", "Описание")
