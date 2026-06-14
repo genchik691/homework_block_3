@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 
 class Product:
@@ -16,29 +16,29 @@ class Product:
         """
         self.name = name
         self.description = description
-        self._price = price  # Приватный атрибут цены
-        self.quantity = quantity  # Обычный атрибут, не приватный
+        self.__price = price  # Приватный атрибут (двойное подчеркивание)
+        self.quantity = quantity
 
     @property
     def price(self) -> float:
         """Геттер для цены"""
-        return self._price
+        return self.__price
 
     @price.setter
-    def price(self, value: float) -> None:
+    def price(self, new_price: float) -> None:
         """
         Сеттер для цены с проверкой
 
         Args:
-            value: Новая цена
+            new_price: Новая цена
         """
-        if value <= 0:
-            print("Цена не должна быть нулевая или отрицательная")
+        if new_price <= 0:
+            print("Цена не может быть отрицательной или нулевой")
         else:
-            self._price = value
+            self.__price = new_price
 
     @classmethod
-    def new_product(cls, product_data: Dict[str, Any]) -> 'Product':
+    def new_product(cls, product_data: dict) -> 'Product':
         """
         Класс-метод для создания продукта из словаря
 
@@ -46,7 +46,7 @@ class Product:
             product_data: Словарь с данными продукта
 
         Returns:
-            Экземпляр класса Product
+            Новый объект Product
         """
         return cls(
             name=product_data.get('name', ''),
@@ -56,10 +56,10 @@ class Product:
         )
 
     def __str__(self) -> str:
-        return f"{self.name}, {self._price} руб. Остаток: {self.quantity} шт."
+        return f"{self.name} - {self.__price} руб."
 
     def __repr__(self) -> str:
-        return f"Product('{self.name}', '{self.description}', {self._price}, {self.quantity})"
+        return f"Product('{self.name}', '{self.description}', {self.__price}, {self.quantity})"
 
 
 class Category:
@@ -80,27 +80,29 @@ class Category:
         """
         self.name = name
         self.description = description
-        self._products = products if products is not None else []
+        self.__products = products if products is not None else []  # Приватный атрибут
 
         # Автоматическое обновление атрибутов класса
         Category.category_count += 1
-        Category.product_count += len(self._products)
+        Category.product_count += len(self.__products)
 
     @property
     def products(self) -> str:
         """
-        Геттер для получения списка товаров в виде строки
+        Геттер для списка товаров, возвращающий строку в заданном формате
 
         Returns:
-            Строка со всеми продуктами в формате "Название продукта, X руб. Остаток: X шт.\n"
+            Строка с информацией о товарах в формате:
+            "Название товара, 80 руб. Остаток: 15 шт.\n..."
         """
-        if not self._products:
+        if not self.__products:
             return ""
 
-        result = ""
-        for product in self._products:
-            result += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
-        return result
+        result = []
+        for product in self.__products:
+            result.append(f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.")
+
+        return "\n".join(result)
 
     def add_product(self, product: Product) -> None:
         """
@@ -109,11 +111,15 @@ class Category:
         Args:
             product: Объект продукта для добавления
         """
-        self._products.append(product)
+        self.__products.append(product)
         Category.product_count += 1
 
+    def get_products_list(self) -> List[Product]:
+        """Возвращает список продуктов (для тестирования)"""
+        return self.__products
+
     def __str__(self) -> str:
-        return f"{self.name}: {len(self._products)} товаров"
+        return f"{self.name}: {len(self.__products)} товаров"
 
     def __repr__(self) -> str:
-        return f"Category('{self.name}', '{self.description}', {self._products})"
+        return f"Category('{self.name}', '{self.description}', {self.__products})"
