@@ -16,7 +16,7 @@ class Product:
         """
         self.name = name
         self.description = description
-        self.__price = price  # Приватный атрибут (двойное подчеркивание)
+        self.__price = price
         self.quantity = quantity
 
     @property
@@ -26,12 +26,7 @@ class Product:
 
     @price.setter
     def price(self, new_price: float) -> None:
-        """
-        Сеттер для цены с проверкой
-
-        Args:
-            new_price: Новая цена
-        """
+        """Сеттер для цены с проверкой"""
         if new_price <= 0:
             print("Цена не может быть отрицательной или нулевой")
         else:
@@ -39,15 +34,7 @@ class Product:
 
     @classmethod
     def new_product(cls, product_data: dict) -> 'Product':
-        """
-        Класс-метод для создания продукта из словаря
-
-        Args:
-            product_data: Словарь с данными продукта
-
-        Returns:
-            Новый объект Product
-        """
+        """Класс-метод для создания продукта из словаря"""
         return cls(
             name=product_data.get('name', ''),
             description=product_data.get('description', ''),
@@ -65,7 +52,6 @@ class Product:
 class Category:
     """Класс для представления категории товаров"""
 
-    # Атрибуты класса для подсчета количества категорий и товаров
     category_count = 0
     product_count = 0
 
@@ -80,37 +66,34 @@ class Category:
         """
         self.name = name
         self.description = description
-        self.__products = products if products is not None else []  # Приватный атрибут
+        self.__products = products if products is not None else []
 
-        # Автоматическое обновление атрибутов класса
         Category.category_count += 1
         Category.product_count += len(self.__products)
 
     @property
     def products(self) -> str:
         """
-        Геттер для списка товаров, возвращающий строку в заданном формате
+        Геттер для списка товаров
 
         Returns:
             Строка с информацией о товарах в формате:
-            "Название товара, 80 руб. Остаток: 15 шт.\n..."
+            "Название продукта, X руб. Остаток: X шт."
+            Каждый товар с новой строки
         """
         if not self.__products:
             return ""
 
         result = []
         for product in self.__products:
+            # Точный формат из задания: "Название продукта, X руб. Остаток: X шт."
+            # Важно: пробел после запятой, точка после руб, пробел после точки
             result.append(f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.")
 
         return "\n".join(result)
 
     def add_product(self, product: Product) -> None:
-        """
-        Добавление продукта в категорию
-
-        Args:
-            product: Объект продукта для добавления
-        """
+        """Добавление продукта в категорию"""
         self.__products.append(product)
         Category.product_count += 1
 
