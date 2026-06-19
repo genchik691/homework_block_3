@@ -1,77 +1,57 @@
 from src.classes import Product, Category
-from src.utils import load_categories_from_json, check_and_merge_product
+from src.utils import load_categories_from_json
+from src.iterators import CategoryIterator
 
 
 def main():
     """Основная функция для демонстрации работы классов"""
 
-    print("=== Демонстрация работы обновленных классов ===")
+    print("=== Демонстрация работы классов ===")
 
-    # Создаем продукты через класс-метод
-    product1_data = {
-        'name': 'Смартфон',
-        'description': 'Современный Смартфон',
-        'price': 25000.50,
-        'quantity': 50
-    }
-    product1 = Product.new_product(product1_data)
-    print(f"Создан продукт: {product1}")
+    # Создаем продукты
+    product1 = Product("Смартфон", "Современный смартфон", 25000.50, 50)
+    product2 = Product("Наушники", "Беспроводные наушники", 3500.00, 100)
+    product3 = Product("Чехол", "Защитный чехол", 500.00, 200)
 
-    # Тестируем сеттер цены
-    print("\n=== Тестирование сеттера цены ===")
-    print(f"Текущая цена: {product1.price}")
+    # Создаем категории
+    electronics = Category("Электроника", "Различные электронные устройства", [product1, product2])
+    accessories = Category("Аксессуары", "Аксессуары для устройств", [product3])
 
-   # Пытаемся установить цену меньше нуля
-    product1.price = -1000
-    print(f"Попытка установить цену -1000 : {product1.price}")
+    print(f"\nВсего категорий: {Category.category_count}")
+    print(f"Всего товаров: {Category.product_count}")
 
-    # Устанавливаем правильную цену
-    product1.price = 23000
-    print(f"Установлена правильная цена 23000: {product1.price}")
+    print("\nИнформация о категориях:")
+    print(f"- {electronics}")
+    print(f"- {accessories}")
 
-    # Создаем категорию
-    print("\n=== Создание категории ===")
-    electronics = Category("Электроника", "Различная электроника")
-    print(f"Создана категория: {electronics.name}")
+    # Демонстрация __str__ продуктов
+    print("\nИнформация о продуктах:")
+    print(f"- {product1}")
+    print(f"- {product2}")
+    print(f"- {product3}")
 
-    # Добавляем продукт в категорию через метод add_product
-    print("\n=== Добавление продукта в категорию ===")
-    electronics.add_product(product1)
-    print(f"Добавлен продукт: {product1.name}")
+    # Демонстрация __add__
+    print("\nДемонстрация сложения продуктов:")
+    total_cost = product1 + product2
+    print(f"{product1.name} + {product2.name} = {total_cost} руб.")
 
-    # Создаем еще один продукт
-    product2 = Product.new_product({
-        'name': 'Наушники',
-        'description': 'Беспроводные наушники',
-        'price': 3500.00,
-        'quantity': 100
-    })
-
-    # Добавляем продукт в категорию
-    electronics.add_product(product2)
-    print(f"Добавлен продукт: {product2.name}")
-
-    # Выводим список товаров через геттер
-    print("\n=== Список товаров в категории ===")
+    # Демонстрация геттера products
+    print("\nТовары в категории 'Электроника':")
     print(electronics.products)
 
-    # Проверяем счетчики
-    print(f"\n=== Статистика ===")
-    print(f"Всего категорий: {Category.category_count}")
-    print(f"Всего продуктов: {Category.product_count}")
+    # Демонстрация итератора (дополнительное задание)
+    print("\n=== Итерация по товарам категории 'Электроника' ===")
+    iterator = CategoryIterator(electronics)
+    for product in iterator:
+        print(f"- {product}")
 
-    # Демонстрация загрузки из JSON (если файл существует)
+    # Загрузка из JSON
     print("\n=== Загрузка данных из JSON ===")
-    try:
-        categories = load_categories_from_json('data/products.json')
-        print(f"Загружено категорий: {len(categories)}")
-        for category in categories:
-            print(f"\nКатегория: {category.name}")
-            print(category.products)
-    except FileNotFoundError:
-        print("Файл data/products.json не найден")
+    categories = load_categories_from_json('data/products.json')
+    print(f"Загружено категорий: {len(categories)}")
+    for category in categories:
+        print(f"- {category}")
 
 
 if __name__ == "__main__":
     main()
-

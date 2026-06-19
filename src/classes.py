@@ -48,6 +48,21 @@ class Product:
     def __repr__(self) -> str:
         return f"Product('{self.name}', '{self.description}', {self.__price}, {self.quantity})"
 
+    def __add__(self, other: 'Product') -> float:
+        """
+        Сложение продуктов(общая стоймость товаров на складе)
+
+        Args:
+            other: другой продукт
+
+        Returns:
+            сумма произведений цены на количество для двух продуктов
+        """
+        if not isinstance(other, Product):
+            raise TypeError(f"Нельзя сложить Product и {type(other).__name__}")
+
+        return (self.__price * self.quantity) + (other.__price * other.quantity)
+
 
 class Category:
     """Класс для представления категории товаров"""
@@ -92,6 +107,16 @@ class Category:
 
         return "\n".join(result)
 
+    @property
+    def total_quantity(self) -> int:
+        """
+        Общее количество товаров в категории
+
+        Returns:
+            Сумма quantity всех продуктов в категории
+        """
+        return sum(product.quantity for product in self.__products)
+
     def add_product(self, product: Product) -> None:
         """Добавление продукта в категорию"""
         self.__products.append(product)
@@ -102,7 +127,13 @@ class Category:
         return self.__products
 
     def __str__(self) -> str:
-        return f"{self.name}: {len(self.__products)} товаров"
+        """
+        Строковое представление категории
+
+        Returns:
+            Строка в формате: "Название категории, количество продуктов: X шт."
+        """
+        return f"{self.name}, количество продуктов: {self.total_quantity} шт."
 
     def __repr__(self) -> str:
         return f"Category('{self.name}', '{self.description}', {self.__products})"
