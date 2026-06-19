@@ -16,20 +16,42 @@ class Product:
         """
         self.name = name
         self.description = description
-        self.price = price
+        self.__price = price
         self.quantity = quantity
 
+    @property
+    def price(self) -> float:
+        """Геттер для цены"""
+        return self.__price
+
+    @price.setter
+    def price(self, new_price: float) -> None:
+        """Сеттер для цены с проверкой"""
+        if new_price <= 0:
+            print("Цена не может быть отрицательной или нулевой")
+        else:
+            self.__price = new_price
+
+    @classmethod
+    def new_product(cls, product_data: dict) -> 'Product':
+        """Класс-метод для создания продукта из словаря"""
+        return cls(
+            name=product_data.get('name', ''),
+            description=product_data.get('description', ''),
+            price=float(product_data.get('price', 0)),
+            quantity=int(product_data.get('quantity', 0))
+        )
+
     def __str__(self) -> str:
-        return f"{self.name} - {self.price} руб."
+        return f"{self.name} - {self.__price} руб."
 
     def __repr__(self) -> str:
-        return f"Product('{self.name}', '{self.description}', {self.price}, {self.quantity})"
+        return f"Product('{self.name}', '{self.description}', {self.__price}, {self.quantity})"
 
 
 class Category:
     """Класс для представления категории товаров"""
 
-    # Атрибуты класса для подсчета количества категорий и товаров
     category_count = 0
     product_count = 0
 
@@ -44,27 +66,43 @@ class Category:
         """
         self.name = name
         self.description = description
-        self.products = products if products is not None else []
+        self.__products = products if products is not None else []
 
-        # Автоматическое обновление атрибутов класса
         Category.category_count += 1
+        Category.product_count += len(self.__products)
 
-        # Подсчет общего количества товаров (уникальных продуктов)
-        # Каждый продукт считается один раз, независимо от его количества в наличии
-        Category.product_count += len(self.products)
+    @property
+    def products(self) -> str:
+        """
+        Геттер для списка товаров
+
+        Returns:
+            Строка с информацией о товарах в формате:
+            "Название продукта, X руб. Остаток: X шт."
+            Каждый товар с новой строки
+        """
+        if not self.__products:
+            return ""
+
+        result = []
+        for product in self.__products:
+            # Точный формат из задания: "Название продукта, X руб. Остаток: X шт."
+            # Важно: пробел после запятой, точка после руб, пробел после точки
+            result.append(f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.")
+
+        return "\n".join(result)
 
     def add_product(self, product: Product) -> None:
-        """
-        Добавление продукта в категорию
-
-        Args:
-            product: Объект продукта для добавления
-        """
-        self.products.append(product)
+        """Добавление продукта в категорию"""
+        self.__products.append(product)
         Category.product_count += 1
 
+    def get_products_list(self) -> List[Product]:
+        """Возвращает список продуктов (для тестирования)"""
+        return self.__products
+
     def __str__(self) -> str:
-        return f"{self.name}: {len(self.products)} товаров"
+        return f"{self.name}: {len(self.__products)} товаров"
 
     def __repr__(self) -> str:
-        return f"Category('{self.name}', '{self.description}', {self.products})"
+        return f"Category('{self.name}', '{self.description}', {self.__products})"

@@ -1,6 +1,7 @@
 import json
 from typing import List
-from src.classes import Product, Category
+
+from src.classes import Category, Product
 
 
 def load_categories_from_json(file_path: str) -> List[Category]:
@@ -24,12 +25,7 @@ def load_categories_from_json(file_path: str) -> List[Category]:
 
             # Создаем продукты для категории
             for product_data in category_data.get('products', []):
-                product = Product(
-                    name=product_data.get('name', ''),
-                    description=product_data.get('description', ''),
-                    price=float(product_data.get('price', 0)),
-                    quantity=int(product_data.get('quantity', 0))
-                )
+                product = Product.new_product(product_data)  # Используем класс-метод
                 products.append(product)
 
             # Создаем категорию с продуктами
