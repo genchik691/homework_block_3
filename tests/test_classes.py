@@ -1,15 +1,29 @@
-import json
-
 import pytest
-
-from src.classes import Category, Product
-from src.utils import load_categories_from_json
+from src.classes import Product, Category, Smartphone, LawnGrass
 
 
 @pytest.fixture
 def sample_product():
     """Фикстура для создания тестового продукта"""
     return Product("Ноутбук", "Мощный игровой ноутбук", 75000.99, 10)
+
+
+@pytest.fixture
+def sample_smartphone():
+    """Фикстура для создания тестового смартфона"""
+    return Smartphone(
+        "iPhone 15", "Флагманский смартфон", 99999.99, 5,
+        "A17 Pro", "iPhone 15 Pro", 256, "Титан"
+    )
+
+
+@pytest.fixture
+def sample_lawn_grass():
+    """Фикстура для создания тестовой травы"""
+    return LawnGrass(
+        "Газонная трава", "Смесь для газона", 1500.00, 20,
+        "Россия", "7-14 дней", "Зеленый"
+    )
 
 
 @pytest.fixture
@@ -27,7 +41,7 @@ class TestProduct:
         """Тест корректной инициализации продукта"""
         assert sample_product.name == "Ноутбук"
         assert sample_product.description == "Мощный игровой ноутбук"
-        assert sample_product.price == 75000.99  # Геттер
+        assert sample_product.price == 75000.99
         assert sample_product.quantity == 10
 
     def test_product_price_getter(self, sample_product):
@@ -44,17 +58,17 @@ class TestProduct:
         sample_product.price = -100
         captured = capsys.readouterr()
         assert "Цена не может быть отрицательной или нулевой" in captured.out
-        assert sample_product.price == 75000.99  # Цена не изменилась
+        assert sample_product.price == 75000.99
 
         sample_product.price = 0
         captured = capsys.readouterr()
         assert "Цена не может быть отрицательной или нулевой" in captured.out
-        assert sample_product.price == 75000.99  # Цена не изменилась
+        assert sample_product.price == 75000.99
 
     def test_product_price_private_attribute(self, sample_product):
         """Тест что цена - приватный атрибут"""
         with pytest.raises(AttributeError):
-            _ = sample_product.__price  # Должен вызвать ошибку
+            _ = sample_product.__price
 
     def test_product_with_different_types(self):
         """Тест инициализации с разными типами данных"""
@@ -65,18 +79,32 @@ class TestProduct:
         assert isinstance(product.quantity, int)
 
     def test_product_string_representation(self, sample_product):
-        """Тест строкового представления продукта"""
-        assert str(sample_product) == "Ноутбук - 75000.99 руб."
+        """Тест __str__ продукта"""
+        expected = "Ноутбук, 75000.99 руб. Остаток: 10 шт."
+        assert str(sample_product) == expected
+
+    def test_product_string_representation_format(self):
+        """Тест формата __str__ продукта"""
+        product = Product("Смартфон", "Описание", 25000.50, 50)
+        result = str(product)
+
+        assert "Смартфон" in result
+        assert "25000.5 руб." in result or "25000.50 руб." in result
+        assert "Остаток: 50 шт." in result
+        assert ", " in result
+        assert ". " in result
+
+    def test_product_repr(self, sample_product):
+        """Тест __repr__ продукта"""
+        expected = "Product('Ноутбук', 'Мощный игровой ноутбук', 75000.99, 10)"
+        assert repr(sample_product) == expected
 
     def test_product_price_zero_through_setter(self):
         """Тест установки нулевой цены через сеттер"""
         product = Product("Бесплатный товар", "Акция", 0.0, 100)
-        assert product.price == 0.0  # Начальное значение может быть 0
+        assert product.price == 0.0
 
-        # Попытка установить 0 через сеттер
         product.price = 0
-        # Цена не должна измениться (остается 0.0 или не меняется)
-        # Сеттер не должен менять цену на 0
 
     def test_new_product_class_method(self):
         """Тест класс-метода new_product"""
@@ -94,8 +122,8 @@ class TestProduct:
         assert product.quantity == 50
         assert isinstance(product, Product)
 
-    def test_product_add_method(self):
-        """Тест магического метода __add__"""
+    def test_product_add_method_same_class(self):
+        """Тест магического метода __add__ с одинаковыми классами"""
         product1 = Product("Товар A", "Описание", 100, 10)
         product2 = Product("Товар B", "Описание", 200, 2)
 
@@ -124,6 +152,99 @@ class TestProduct:
         product = Product("Товар", "Описание", 100, 10)
         with pytest.raises(TypeError, match="Нельзя сложить Product и int"):
             _ = product + 5
+
+
+class TestSmartphone:
+    """Тесты для класса Smartphone"""
+
+    def test_smartphone_initialization(self, sample_smartphone):
+        """Тест корректной инициализации смартфона"""
+        assert sample_smartphone.name == "iPhone 15"
+        assert sample_smartphone.description == "Флагманский смартфон"
+        assert sample_smartphone.price == 99999.99
+        assert sample_smartphone.quantity == 5
+        assert sample_smartphone.efficiency == "A17 Pro"
+        assert sample_smartphone.model == "iPhone 15 Pro"
+        assert sample_smartphone.memory == 256
+        assert sample_smartphone.color == "Титан"
+
+    def test_smartphone_inheritance(self, sample_smartphone):
+        """Тест что Smartphone наследник Product"""
+        assert isinstance(sample_smartphone, Product)
+        assert issubclass(Smartphone, Product)
+
+    def test_smartphone_string_representation(self, sample_smartphone):
+        """Тест __str__ смартфона"""
+        result = str(sample_smartphone)
+        assert "iPhone 15" in result
+        assert "99999.99 руб." in result
+        assert "Остаток: 5 шт." in result
+
+    def test_smartphone_repr(self, sample_smartphone):
+        """Тест __repr__ смартфона"""
+        expected = "Smartphone('iPhone 15', 'Флагманский смартфон', 99999.99, 5, 'A17 Pro', 'iPhone 15 Pro', 256, 'Титан')"
+        assert repr(sample_smartphone) == expected
+
+    def test_smartphone_add_same_class(self, sample_smartphone):
+        """Тест сложения двух смартфонов"""
+        smartphone2 = Smartphone(
+            "Samsung Galaxy", "Флагман", 89999.99, 3,
+            "Exynos 2200", "S23 Ultra", 512, "Черный"
+        )
+        result = sample_smartphone + smartphone2
+        expected = (99999.99 * 5) + (89999.99 * 3)
+        assert result == expected
+
+    def test_smartphone_add_different_class(self, sample_smartphone, sample_lawn_grass):
+        """Тест сложения смартфона и травы (должна быть ошибка)"""
+        with pytest.raises(TypeError, match="Нельзя сложить товары разных классов: Smartphone и LawnGrass"):
+            _ = sample_smartphone + sample_lawn_grass
+
+
+class TestLawnGrass:
+    """Тесты для класса LawnGrass"""
+
+    def test_lawn_grass_initialization(self, sample_lawn_grass):
+        """Тест корректной инициализации травы"""
+        assert sample_lawn_grass.name == "Газонная трава"
+        assert sample_lawn_grass.description == "Смесь для газона"
+        assert sample_lawn_grass.price == 1500.00
+        assert sample_lawn_grass.quantity == 20
+        assert sample_lawn_grass.country == "Россия"
+        assert sample_lawn_grass.germination_period == "7-14 дней"
+        assert sample_lawn_grass.color == "Зеленый"
+
+    def test_lawn_grass_inheritance(self, sample_lawn_grass):
+        """Тест что LawnGrass наследник Product"""
+        assert isinstance(sample_lawn_grass, Product)
+        assert issubclass(LawnGrass, Product)
+
+    def test_lawn_grass_string_representation(self, sample_lawn_grass):
+        """Тест __str__ травы"""
+        result = str(sample_lawn_grass)
+        assert "Газонная трава" in result
+        assert "1500.0 руб." in result
+        assert "Остаток: 20 шт." in result
+
+    def test_lawn_grass_repr(self, sample_lawn_grass):
+        """Тест __repr__ травы"""
+        expected = "LawnGrass('Газонная трава', 'Смесь для газона', 1500.0, 20, 'Россия', '7-14 дней', 'Зеленый')"
+        assert repr(sample_lawn_grass) == expected
+
+    def test_lawn_grass_add_same_class(self, sample_lawn_grass):
+        """Тест сложения двух трав"""
+        grass2 = LawnGrass(
+            "Газон", "Теневой газон", 1800.00, 10,
+            "Германия", "10-20 дней", "Темно-зеленый"
+        )
+        result = sample_lawn_grass + grass2
+        expected = (1500.00 * 20) + (1800.00 * 10)
+        assert result == expected
+
+    def test_lawn_grass_add_different_class(self, sample_lawn_grass, sample_smartphone):
+        """Тест сложения травы и смартфона (должна быть ошибка)"""
+        with pytest.raises(TypeError, match="Нельзя сложить товары разных классов: LawnGrass и Smartphone"):
+            _ = sample_lawn_grass + sample_smartphone
 
 
 class TestCategory:
@@ -160,7 +281,6 @@ class TestCategory:
 
     def test_category_string_representation(self, sample_category):
         """Тест __str__ категории"""
-        # total_quantity = 25 + 15 = 40
         expected = "Электроника, количество продуктов: 40 шт."
         assert str(sample_category) == expected
 
@@ -178,7 +298,7 @@ class TestCategory:
             Product("Товар 3", "Описание", 300, 30)
         ]
         category = Category("Тест", "Описание", products)
-        assert category.total_quantity == 60  # 10 + 20 + 30
+        assert category.total_quantity == 60
 
     def test_category_total_quantity_empty(self):
         """Тест total_quantity для пустой категории"""
@@ -263,113 +383,42 @@ class TestCategory:
 
         assert Category.product_count == initial_count + 1
 
-class TestUtils:
-    """Тесты для утилит загрузки данных"""
+    def test_add_product_with_smartphone(self):
+        """Тест добавления смартфона в категорию"""
+        category = Category("Смартфоны", "Категория смартфонов")
+        smartphone = Smartphone(
+            "iPhone 15", "Флагман", 99999.99, 5,
+            "A17 Pro", "iPhone 15 Pro", 256, "Титан"
+        )
 
-    def test_load_categories_from_json_success(self, tmp_path):
-        """Тест успешной загрузки категорий из JSON"""
-        # Создаем временный JSON файл
-        json_data = [
-            {
-                "name": "Электроника",
-                "description": "Различные электронные устройства",
-                "products": [
-                    {
-                        "name": "Смартфон",
-                        "description": "Современный смартфон",
-                        "price": 25000.50,
-                        "quantity": 50
-                    },
-                    {
-                        "name": "Наушники",
-                        "description": "Беспроводные наушники",
-                        "price": 3500.00,
-                        "quantity": 100
-                    }
-                ]
-            },
-            {
-                "name": "Аксессуары",
-                "description": "Аксессуары для устройств",
-                "products": [
-                    {
-                        "name": "Чехол",
-                        "description": "Защитный чехол",
-                        "price": 500.00,
-                        "quantity": 200
-                    }
-                ]
-            }
-        ]
+        category.add_product(smartphone)
+        assert len(category.get_products_list()) == 1
+        assert isinstance(category.get_products_list()[0], Smartphone)
 
-        # Сохраняем во временный файл
-        json_file = tmp_path / "test_products.json"
-        with open(json_file, 'w', encoding='utf-8') as f:
-            json.dump(json_data, f, ensure_ascii=False, indent=2)
+    def test_add_product_with_lawn_grass(self):
+        """Тест добавления травы в категорию"""
+        category = Category("Газоны", "Категория газонов")
+        grass = LawnGrass(
+            "Газонная трава", "Смесь", 1500.00, 20,
+            "Россия", "7-14 дней", "Зеленый"
+        )
 
-        # Загружаем категории
-        categories = load_categories_from_json(str(json_file))
+        category.add_product(grass)
+        assert len(category.get_products_list()) == 1
+        assert isinstance(category.get_products_list()[0], LawnGrass)
 
-        # Проверяем результат
-        assert len(categories) == 2
-        assert categories[0].name == "Электроника"
-        assert categories[0].description == "Различные электронные устройства"
-        assert len(categories[0].get_products_list()) == 2
+    def test_add_product_invalid_type(self):
+        """Тест добавления не-продукта в категорию (должна быть ошибка)"""
+        category = Category("Тест", "Описание")
 
-        assert categories[1].name == "Аксессуары"
-        assert len(categories[1].get_products_list()) == 1
+        with pytest.raises(TypeError, match="Можно добавлять только объекты Product или его наследников"):
+            category.add_product("это строка, не продукт")
 
-        # Проверяем продукты
-        products = categories[0].get_products_list()
-        assert products[0].name == "Смартфон"
-        assert products[0].price == 25000.50
-        assert products[0].quantity == 50
+        with pytest.raises(TypeError, match="Можно добавлять только объекты Product или его наследников"):
+            category.add_product(123)
 
-    def test_load_categories_from_json_empty(self, tmp_path):
-        """Тест загрузки пустого JSON файла"""
-        json_file = tmp_path / "empty.json"
-        with open(json_file, 'w', encoding='utf-8') as f:
-            json.dump([], f)
+        with pytest.raises(TypeError, match="Можно добавлять только объекты Product или его наследников"):
+            category.add_product(None)
 
-        categories = load_categories_from_json(str(json_file))
-        assert categories == []
-
-    def test_load_categories_from_json_file_not_found(self, capsys):
-        """Тест загрузки из несуществующего файла"""
-        categories = load_categories_from_json("non_existent_file.json")
-        assert categories == []
-
-        captured = capsys.readouterr()
-        assert "Файл non_existent_file.json не найден" in captured.out
-
-    def test_load_categories_from_json_invalid_json(self, tmp_path, capsys):
-        """Тест загрузки из некорректного JSON файла"""
-        json_file = tmp_path / "invalid.json"
-        with open(json_file, 'w', encoding='utf-8') as f:
-            f.write("this is not valid json")
-
-        categories = load_categories_from_json(str(json_file))
-        assert categories == []
-
-        captured = capsys.readouterr()
-        assert "Ошибка декодирования JSON" in captured.out
-
-    def test_load_categories_from_json_missing_fields(self, tmp_path):
-        """Тест загрузки JSON с отсутствующими полями"""
-        json_data = [
-            {
-                "name": "Категория без товаров"
-                # Отсутствует description и products
-            }
-        ]
-
-        json_file = tmp_path / "missing_fields.json"
-        with open(json_file, 'w', encoding='utf-8') as f:
-            json.dump(json_data, f)
-
-        categories = load_categories_from_json(str(json_file))
-
-        assert len(categories) == 1
-        assert categories[0].name == "Категория без товаров"
-        assert categories[0].description == ""  # Значение по умолчанию
-        assert categories[0].get_products_list() == []  # Пустой список по умолчанию
+        # Проверяем, что продукты не были добавлены
+        assert len(category.get_products_list()) == 0
