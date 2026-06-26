@@ -1,8 +1,8 @@
-from typing import List, Optional
+from typing import List, Optional, Type
 
 
 class Product:
-    """Класс для представления продукта"""
+    """Базовый класс для представления продукта"""
 
     def __init__(self, name: str, description: str, price: float, quantity: int):
         """
@@ -43,25 +43,94 @@ class Product:
         )
 
     def __str__(self) -> str:
-        return f"{self.name} - {self.__price} руб."
+        """
+        Строковое представление продукта
+
+        Returns:
+            Строка в формате: "Название продукта, X руб. Остаток: X шт."
+        """
+        return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
 
     def __repr__(self) -> str:
         return f"Product('{self.name}', '{self.description}', {self.__price}, {self.quantity})"
 
     def __add__(self, other: 'Product') -> float:
         """
-        Сложение продуктов(общая стоймость товаров на складе)
+        Сложение продуктов (общая стоимость товаров на складе)
 
         Args:
-            other: другой продукт
+            other: Другой продукт для сложения
 
         Returns:
-            сумма произведений цены на количество для двух продуктов
+            Сумма произведений цены на количество для двух продуктов
+
+        Raises:
+            TypeError: Если типы продуктов не совпадают
         """
         if not isinstance(other, Product):
             raise TypeError(f"Нельзя сложить Product и {type(other).__name__}")
 
-        return (self.__price * self.quantity) + (other.__price * other.quantity)
+        # Проверяем, что объекты одного класса
+        if type(self) is not type(other):
+            raise TypeError(f"Нельзя сложить товары разных классов: {type(self).__name__} и {type(other).__name__}")
+
+        return (self.price * self.quantity) + (other.price * other.quantity)
+
+
+class Smartphone(Product):
+    """Класс для представления смартфона"""
+
+    def __init__(self, name: str, description: str, price: float, quantity: int,
+                 efficiency: str, model: str, memory: int, color: str):
+        """
+        Инициализация смартфона
+
+        Args:
+            name: Название смартфона
+            description: Описание смартфона
+            price: Цена смартфона
+            quantity: Количество в наличии
+            efficiency: Производительность
+            model: Модель смартфона
+            memory: Объем встроенной памяти (ГБ)
+            color: Цвет смартфона
+        """
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+    def __repr__(self) -> str:
+        return (f"Smartphone('{self.name}', '{self.description}', {self.price}, {self.quantity}, "
+                f"'{self.efficiency}', '{self.model}', {self.memory}, '{self.color}')")
+
+
+class LawnGrass(Product):
+    """Класс для представления газонной травы"""
+
+    def __init__(self, name: str, description: str, price: float, quantity: int,
+                 country: str, germination_period: str, color: str):
+        """
+        Инициализация газонной травы
+
+        Args:
+            name: Название травы
+            description: Описание травы
+            price: Цена травы
+            quantity: Количество в наличии
+            country: Страна-производитель
+            germination_period: Срок прорастания
+            color: Цвет травы
+        """
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
+    def __repr__(self) -> str:
+        return (f"LawnGrass('{self.name}', '{self.description}', {self.price}, {self.quantity}, "
+                f"'{self.country}', '{self.germination_period}', '{self.color}')")
 
 
 class Category:
@@ -92,20 +161,12 @@ class Category:
         Геттер для списка товаров
 
         Returns:
-            Строка с информацией о товарах в формате:
-            "Название продукта, X руб. Остаток: X шт."
-            Каждый товар с новой строки
+            Строка с информацией о товарах, каждый с новой строки
         """
         if not self.__products:
             return ""
 
-        result = []
-        for product in self.__products:
-            # Точный формат из задания: "Название продукта, X руб. Остаток: X шт."
-            # Важно: пробел после запятой, точка после руб, пробел после точки
-            result.append(f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.")
-
-        return "\n".join(result)
+        return "\n".join(str(product) for product in self.__products)
 
     @property
     def total_quantity(self) -> int:
@@ -118,7 +179,20 @@ class Category:
         return sum(product.quantity for product in self.__products)
 
     def add_product(self, product: Product) -> None:
-        """Добавление продукта в категорию"""
+        """
+        Добавление продукта в категорию
+
+        Args:
+            product: Объект продукта для добавления
+
+        Raises:
+            TypeError: Если добавляемый объект не является продуктом или его наследником
+        """
+        # Проверяем, что объект является продуктом или его наследником
+        if not isinstance(product, Product):
+            raise TypeError(
+                f"Можно добавлять только объекты Product или его наследников. Получен: {type(product).__name__}")
+
         self.__products.append(product)
         Category.product_count += 1
 
