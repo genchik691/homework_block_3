@@ -52,14 +52,6 @@ class LoggingMixin:
         params_str = ", ".join(params)
         print(f"{class_name}({params_str})")
 
-    def __repr__(self):
-        """Строковое представление для логирования"""
-        return f"{self.__class__.__name__}({self._get_repr_params()})"
-
-    def _get_repr_params(self):
-        """Вспомогательный метод для получения параметров repr"""
-        return ""
-
 
 class Product(LoggingMixin, BaseProduct):
     """Базовый класс для представления продукта"""
@@ -73,9 +65,14 @@ class Product(LoggingMixin, BaseProduct):
             description: Описание продукта
             price: Цена продукта
             quantity: Количество в наличии
-            *args: Дополнительные позиционные аргументы (для передачи в миксин)
-            **kwargs: Дополнительные именованные аргументы (для передачи в миксин)
+
+        Raises:
+            ValueError: Если количество товара равно 0
         """
+        # Проверяем количество товара
+        if quantity == 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+
         # Сохраняем атрибуты
         self.name = name
         self.description = description
@@ -164,6 +161,9 @@ class Smartphone(Product):
             model: Модель смартфона
             memory: Объем встроенной памяти (ГБ)
             color: Цвет смартфона
+
+        Raises:
+            ValueError: Если количество товара равно 0
         """
         # Сохраняем специфические атрибуты
         self.efficiency = efficiency
@@ -201,6 +201,9 @@ class LawnGrass(Product):
             country: Страна-производитель
             germination_period: Срок прорастания
             color: Цвет травы
+
+        Raises:
+            ValueError: Если количество товара равно 0
         """
         # Сохраняем специфические атрибуты
         self.country = country
@@ -266,6 +269,22 @@ class Category:
         """
         return sum(product.quantity for product in self.__products)
 
+    def average_price(self) -> float:
+        """
+        Подсчет среднего ценника всех товаров в категории
+
+        Returns:
+            Средняя цена товаров в категории или 0, если товаров нет
+        """
+        if not self.__products:
+            return 0.0
+
+        try:
+            total_price = sum(product.price for product in self.__products)
+            return total_price / len(self.__products)
+        except ZeroDivisionError:
+            return 0.0
+
     def add_product(self, product: Product) -> None:
         """
         Добавление продукта в категорию
@@ -312,7 +331,13 @@ class Order(BaseProduct):
         Args:
             product: Товар в заказе
             quantity: Количество товара
+
+        Raises:
+            ValueError: Если количество товара равно 0
         """
+        if quantity == 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен в заказ")
+
         self.product = product
         self.quantity = quantity
 
