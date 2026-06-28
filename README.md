@@ -75,7 +75,8 @@ homework_block_3/
 ├── tests/
 │ ├── init.py # Инициализация тестового пакета
 │ ├── test_classes.py # Тесты для всех классов
-│ └── test_iterators.py # Тесты для итератора
+│ ├── test_iterators.py # Тесты для итератора
+│ └── test_utils.py  # Тесты для загрузки данных из JSON
 ├── data/
 │ └── products.json # Данные для загрузки
 ├── main.py # Демонстрационный скрипт
