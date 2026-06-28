@@ -64,9 +64,42 @@ try:
 except ValueError as e:
     print(e)  # "Товар с нулевым количеством не может быть добавлен"
 ```
+### ОТЧЕТЫ:
+
+```markdown
+## 📊 Отчет о покрытии тестами
+
+Проект имеет покрытие тестами **90%**, что значительно превышает требуемые 75%.
+
+### Текущее покрытие
+
+| Компонент | Покрытие |
+|-----------|----------|
+| classes.py | 87% |
+| iterators.py | 100% |
+| utils.py | 100% |
+| **Общее** | **90%** |
+
+### Результаты тестов
+- **Всего тестов:** 47
+- **Пройдено:** 47 (100%)
+- **Провалено:** 0 (0%)
+
+### Просмотр отчета
+
+```bash
+# Открыть HTML отчет в браузере
+start coverage_report/index.html  # Windows
+open coverage_report/index.html   # macOS/Linux
+
+# Или посмотреть текстовый отчет
+cat coverage_report/coverage.txt
+```
+
 ## 📁 Структура проекта:
 ```
 homework_block_3/
+├── coverage_report/ # отчет покрытия тестами
 ├── src/
 │ ├── init.py # Инициализация пакета
 │ ├── classes.py # Основные классы (Product, Category, Smartphone, LawnGrass, BaseProduct, LoggingMixin)
@@ -80,6 +113,7 @@ homework_block_3/
 ├── data/
 │ └── products.json # Данные для загрузки
 ├── main.py # Демонстрационный скрипт
+├── coverage_report.md # отчет покрытия тестами
 ├── pyproject.toml # Конфигурация Poetry
 ├── README.md
 ├── .flake8 # Конфигурация Flake8
