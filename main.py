@@ -1,4 +1,4 @@
-from src.classes import Product, Category, Smartphone, LawnGrass
+from src.classes import Product, Category, Smartphone, LawnGrass, Order
 from src.utils import load_categories_from_json
 from src.iterators import CategoryIterator
 
@@ -7,13 +7,17 @@ def main():
     """Основная функция для демонстрации работы классов"""
 
     print("=== Демонстрация работы классов ===")
+    print("\nПри создании объектов миксин будет выводить информацию:")
+    print("-" * 50)
 
-    # Создаем обычные продукты
+    # Создаем обычные продукты (миксин выведет информацию)
     product1 = Product("Смартфон", "Современный смартфон", 25000.50, 50)
     product2 = Product("Наушники", "Беспроводные наушники", 3500.00, 100)
     product3 = Product("Чехол", "Защитный чехол", 500.00, 200)
 
-    # Создаем смартфоны
+    print("-" * 50)
+
+    # Создаем смартфоны (миксин выведет информацию)
     smartphone1 = Smartphone(
         "iPhone 15 Pro", "Флагманский смартфон Apple", 99999.99, 10,
         "A17 Pro", "iPhone 15 Pro", 256, "Титан"
@@ -23,7 +27,9 @@ def main():
         "Snapdragon 8 Gen 2", "S23 Ultra", 512, "Черный"
     )
 
-    # Создаем газонную траву
+    print("-" * 50)
+
+    # Создаем газонную траву (миксин выведет информацию)
     grass1 = LawnGrass(
         "Газонная трава", "Смесь для солнечного газона", 1500.00, 50,
         "Россия", "7-14 дней", "Зеленый"
@@ -32,6 +38,9 @@ def main():
         "Теневой газон", "Смесь для тенистого газона", 1800.00, 30,
         "Германия", "10-20 дней", "Темно-зеленый"
     )
+
+    print("-" * 50)
+    print("\n=== Основная информация ===")
 
     # Создаем категории
     electronics = Category("Электроника", "Различные электронные устройства", [product1, product2])
@@ -46,12 +55,6 @@ def main():
     print(f"- {smartphones}")
     print(f"- {garden}")
 
-    # Демонстрация __str__ продуктов
-    print("\nИнформация о продуктах:")
-    print(f"- {product1}")
-    print(f"- {smartphone1}")
-    print(f"- {grass1}")
-
     # Демонстрация __add__
     print("\nДемонстрация сложения продуктов:")
     try:
@@ -60,33 +63,10 @@ def main():
     except TypeError as e:
         print(f"Ошибка: {e}")
 
-    try:
-        total_cost = grass1 + grass2
-        print(f"{grass1.name} + {grass2.name} = {total_cost} руб.")
-    except TypeError as e:
-        print(f"Ошибка: {e}")
-
-    # Демонстрация ошибки при сложении разных классов
-    print("\nПопытка сложить смартфон и траву:")
-    try:
-        result = smartphone1 + grass1
-        print(f"Результат: {result}")
-    except TypeError as e:
-        print(f"Ошибка: {e}")
-
-    # Демонстрация добавления продуктов в категорию
-    print("\nДобавление продуктов в категорию:")
-    try:
-        electronics.add_product(smartphone1)
-        print(f"Смартфон успешно добавлен в категорию 'Электроника'")
-    except TypeError as e:
-        print(f"Ошибка: {e}")
-
-    try:
-        electronics.add_product("не продукт")
-        print("Строка добавлена в категорию")
-    except TypeError as e:
-        print(f"Ошибка: {e}")
+    # Демонстрация заказа (дополнительное задание)
+    print("\n=== Демонстрация заказа ===")
+    order = Order(smartphone1, 2)
+    print(f"{order}")
 
     # Демонстрация итератора
     print("\n=== Итерация по товарам категории 'Смартфоны' ===")
@@ -104,4 +84,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
