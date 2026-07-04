@@ -207,3 +207,91 @@ class TestOrder:
         order = Order(sample_product, 3)
         with pytest.raises(AttributeError, match="Нельзя изменить цену заказа напрямую"):
             order.price = 1000
+
+
+class TestProductExceptions:
+    """Тесты для исключений в классе Product"""
+
+    def test_product_zero_quantity_raises_error(self):
+        """Тест что создание продукта с нулевым количеством вызывает ValueError"""
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            Product("Тестовый товар", "Описание", 100, 0)
+
+    def test_smartphone_zero_quantity_raises_error(self):
+        """Тест что создание смартфона с нулевым количеством вызывает ValueError"""
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            Smartphone(
+                "iPhone", "Флагман", 99999.99, 0,
+                "A17 Pro", "iPhone 15 Pro", 256, "Титан"
+            )
+
+    def test_lawn_grass_zero_quantity_raises_error(self):
+        """Тест что создание травы с нулевым количеством вызывает ValueError"""
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+            LawnGrass(
+                "Газон", "Описание", 1500.00, 0,
+                "Россия", "7-14 дней", "Зеленый"
+            )
+
+
+class TestCategoryAveragePrice:
+    """Тесты для метода average_price в классе Category"""
+
+    def test_average_price_with_products(self):
+        """Тест подсчета средней цены с товарами"""
+        products = [
+            Product("Товар 1", "Описание", 100, 10),
+            Product("Товар 2", "Описание", 200, 20),
+            Product("Товар 3", "Описание", 300, 30)
+        ]
+        category = Category("Тест", "Описание", products)
+
+        expected_average = (100 + 200 + 300) / 3
+        assert category.average_price() == expected_average
+
+    def test_average_price_with_smartphones(self):
+        """Тест подсчета средней цены со смартфонами"""
+        products = [
+            Smartphone("iPhone", "Флагман", 99999.99, 5, "A17", "15 Pro", 256, "Титан"),
+            Smartphone("Samsung", "Флагман", 89999.99, 3, "Exynos", "S23", 512, "Черный")
+        ]
+        category = Category("Смартфоны", "Описание", products)
+
+        expected_average = (99999.99 + 89999.99) / 2
+        assert category.average_price() == expected_average
+
+    def test_average_price_empty_category(self):
+        """Тест подсчета средней цены в пустой категории (должен вернуть 0)"""
+        category = Category("Пустая категория", "Описание")
+        assert category.average_price() == 0.0
+
+    def test_average_price_category_with_one_product(self):
+        """Тест подсчета средней цены с одним товаром"""
+        product = Product("Товар", "Описание", 150, 5)
+        category = Category("Тест", "Описание", [product])
+
+        assert category.average_price() == 150.0
+
+    def test_average_price_after_adding_products(self):
+        """Тест подсчета средней цены после добавления товаров"""
+        category = Category("Тест", "Описание")
+
+        # Добавляем первый товар
+        product1 = Product("Товар 1", "Описание", 100, 10)
+        category.add_product(product1)
+        assert category.average_price() == 100.0
+
+        # Добавляем второй товар
+        product2 = Product("Товар 2", "Описание", 200, 20)
+        category.add_product(product2)
+        assert category.average_price() == 150.0
+
+
+class TestOrderExceptions:
+    """Тесты для исключений в классе Order (дополнительное задание)"""
+
+    def test_order_zero_quantity_raises_error(self):
+        """Тест что создание заказа с нулевым количеством вызывает ValueError"""
+        product = Product("Товар", "Описание", 100, 10)
+        with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен в заказ"):
+            Order(product, 0)
